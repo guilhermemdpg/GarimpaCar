@@ -1,0 +1,1006 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#10120f" />
+    <meta
+      name="description"
+      content="Encontre e compare as ofertas de carros que mais combinam com você."
+    />
+    <title>GarimpaCar — Encontre a melhor oferta</title>
+    <link
+      rel="icon"
+      type="image/svg+xml"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%2310120f'/%3E%3Cpath d='M14 37h36l-4-11a7 7 0 0 0-7-5H25a7 7 0 0 0-7 5l-4 11Z' fill='%23ccff33'/%3E%3Cpath d='M13 37h38v9a4 4 0 0 1-4 4H17a4 4 0 0 1-4-4v-9Z' fill='%23f7f8f3'/%3E%3Ccircle cx='21' cy='45' r='4' fill='%2310120f'/%3E%3Ccircle cx='43' cy='45' r='4' fill='%2310120f'/%3E%3C/svg%3E"
+    />
+    <style>
+      :root {
+        color-scheme: light;
+        --ink: #151712;
+        --muted: #656a60;
+        --paper: #f4f5f0;
+        --surface: #ffffff;
+        --line: #dedfd8;
+        --dark: #10120f;
+        --dark-2: #1c1f19;
+        --accent: #ccff33;
+        --accent-strong: #a8db11;
+        --good: #157347;
+        --shadow: 0 18px 55px rgba(21, 23, 18, 0.08);
+        --radius: 22px;
+      }
+
+      * { box-sizing: border-box; }
+
+      html { scroll-behavior: smooth; }
+
+      body {
+        margin: 0;
+        background: var(--paper);
+        color: var(--ink);
+        font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        font-size: 16px;
+        line-height: 1.5;
+      }
+
+      button, input, select { font: inherit; }
+      button, select, input[type="checkbox"] { cursor: pointer; }
+
+      button:focus-visible,
+      input:focus-visible,
+      select:focus-visible {
+        outline: 3px solid rgba(168, 219, 17, 0.42);
+        outline-offset: 2px;
+      }
+
+      .topbar {
+        position: sticky;
+        top: 0;
+        z-index: 20;
+        background: rgba(244, 245, 240, 0.92);
+        backdrop-filter: blur(16px);
+        border-bottom: 1px solid rgba(222, 223, 216, 0.75);
+      }
+
+      .topbar-inner,
+      main,
+      footer {
+        width: min(1440px, calc(100% - 40px));
+        margin-inline: auto;
+      }
+
+      .topbar-inner {
+        min-height: 72px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 24px;
+      }
+
+      .brand {
+        display: inline-flex;
+        align-items: center;
+        gap: 11px;
+        color: var(--ink);
+        text-decoration: none;
+        font-weight: 850;
+        letter-spacing: -0.04em;
+        font-size: 1.35rem;
+      }
+
+      .brand-mark {
+        width: 34px;
+        height: 34px;
+        border-radius: 11px;
+        display: grid;
+        place-items: center;
+        background: var(--dark);
+        color: var(--accent);
+      }
+
+      .brand-mark svg { width: 21px; height: 21px; }
+
+      .demo-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 12px;
+        border-radius: 999px;
+        background: #ebede6;
+        color: #4b5046;
+        font-size: 0.8rem;
+        font-weight: 700;
+      }
+
+      .demo-pill::before {
+        content: "";
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: var(--accent-strong);
+        box-shadow: 0 0 0 4px rgba(168, 219, 17, 0.16);
+      }
+
+      main { padding-block: 28px 64px; }
+
+      .spotlight {
+        min-height: 260px;
+        display: grid;
+        grid-template-columns: minmax(320px, 0.85fr) 1.15fr;
+        overflow: hidden;
+        border-radius: 30px;
+        background: var(--dark);
+        color: #fff;
+        box-shadow: var(--shadow);
+      }
+
+      .spotlight-copy {
+        position: relative;
+        z-index: 2;
+        padding: 42px 44px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+      }
+
+      .eyebrow {
+        margin: 0 0 12px;
+        color: var(--accent);
+        font-size: 0.75rem;
+        font-weight: 800;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+      }
+
+      h1 {
+        max-width: 590px;
+        margin: 0;
+        font-size: clamp(2.2rem, 4.3vw, 4.2rem);
+        line-height: 0.98;
+        letter-spacing: -0.065em;
+      }
+
+      .spotlight p:not(.eyebrow) {
+        max-width: 560px;
+        margin: 18px 0 0;
+        color: #c9cec2;
+        font-size: 1rem;
+      }
+
+      .spotlight-media { position: relative; min-height: 260px; }
+
+      .spotlight-media::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(90deg, var(--dark) 0%, rgba(16, 18, 15, 0.08) 36%, transparent 72%);
+      }
+
+      .spotlight-media img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        object-position: 69% center;
+        display: block;
+      }
+
+      .workspace {
+        display: grid;
+        grid-template-columns: 320px minmax(0, 1fr);
+        gap: 24px;
+        margin-top: 24px;
+        align-items: start;
+      }
+
+      .filters {
+        position: sticky;
+        top: 94px;
+        background: var(--surface);
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        padding: 24px;
+        box-shadow: 0 12px 30px rgba(21, 23, 18, 0.04);
+      }
+
+      .filters h2,
+      .results h2 {
+        margin: 0;
+        font-size: 1.22rem;
+        letter-spacing: -0.03em;
+      }
+
+      .filters-subtitle {
+        margin: 4px 0 22px;
+        color: var(--muted);
+        font-size: 0.88rem;
+      }
+
+      .field { margin-bottom: 18px; }
+      .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+      label,
+      legend {
+        display: block;
+        margin-bottom: 7px;
+        color: #40443d;
+        font-size: 0.82rem;
+        font-weight: 750;
+      }
+
+      select,
+      input[type="number"] {
+        width: 100%;
+        min-height: 46px;
+        border: 1px solid #d8dad3;
+        border-radius: 12px;
+        background: #fbfcf9;
+        color: var(--ink);
+        padding: 0 13px;
+      }
+
+      select:hover,
+      input[type="number"]:hover { border-color: #bfc3b8; }
+
+      fieldset {
+        margin: 0 0 18px;
+        padding: 0;
+        border: 0;
+      }
+
+      .checks { display: grid; grid-template-columns: 1fr 1fr; gap: 9px 10px; }
+
+      .check {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin: 0;
+        font-size: 0.82rem;
+        font-weight: 600;
+        color: #4d5149;
+      }
+
+      .check input {
+        width: 17px;
+        height: 17px;
+        accent-color: var(--dark);
+      }
+
+      .filter-actions { display: grid; grid-template-columns: 1fr auto; gap: 10px; }
+
+      .primary,
+      .ghost,
+      .source-button,
+      .favorite-button,
+      .mobile-filter-button {
+        min-height: 46px;
+        border: 0;
+        border-radius: 12px;
+        font-weight: 800;
+      }
+
+      .primary {
+        background: var(--dark);
+        color: #fff;
+        padding: 0 18px;
+      }
+
+      .primary:hover { background: #282c24; }
+
+      .ghost {
+        background: #eef0ea;
+        color: #53584f;
+        padding: 0 14px;
+      }
+
+      .results { min-width: 0; }
+
+      .results-toolbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 20px;
+        margin-bottom: 16px;
+      }
+
+      .result-count {
+        margin: 4px 0 0;
+        color: var(--muted);
+        font-size: 0.88rem;
+      }
+
+      .toolbar-actions { display: flex; align-items: center; gap: 10px; }
+
+      .sort-label { margin: 0; white-space: nowrap; }
+      .sort-select { width: auto; min-width: 184px; background: var(--surface); }
+      .mobile-filter-button { display: none; background: var(--dark); color: white; padding: 0 16px; }
+
+      .active-filters {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-bottom: 14px;
+      }
+
+      .chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        min-height: 34px;
+        border: 1px solid #d6d8d0;
+        border-radius: 999px;
+        background: #fff;
+        color: #4f544b;
+        padding: 0 12px;
+        font-size: 0.78rem;
+        font-weight: 750;
+      }
+
+      .offer-list { display: grid; gap: 14px; }
+
+      .offer-card {
+        position: relative;
+        display: grid;
+        grid-template-columns: 218px minmax(0, 1fr) 182px;
+        gap: 20px;
+        align-items: center;
+        min-height: 218px;
+        padding: 18px;
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        background: var(--surface);
+        box-shadow: 0 10px 28px rgba(21, 23, 18, 0.045);
+        transition: transform 160ms ease, box-shadow 160ms ease, border-color 160ms ease;
+      }
+
+      .offer-card:hover {
+        transform: translateY(-2px);
+        border-color: #c8cbc1;
+        box-shadow: 0 18px 42px rgba(21, 23, 18, 0.08);
+      }
+
+      .car-photo {
+        position: relative;
+        height: 180px;
+        overflow: hidden;
+        border-radius: 16px;
+        background: #1a1c19;
+      }
+
+      .car-photo img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        object-position: 68% center;
+        display: block;
+        transform: scale(1.04);
+      }
+
+      .car-photo::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(180deg, transparent 58%, rgba(0,0,0,.48));
+      }
+
+      .source-tag {
+        position: absolute;
+        left: 12px;
+        bottom: 11px;
+        z-index: 2;
+        border-radius: 7px;
+        background: rgba(255,255,255,.93);
+        color: #22251f;
+        padding: 5px 8px;
+        font-size: 0.7rem;
+        font-weight: 850;
+      }
+
+      .score-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        width: fit-content;
+        padding: 5px 9px;
+        border-radius: 999px;
+        background: #effbd0;
+        color: #3d5700;
+        font-size: 0.74rem;
+        font-weight: 850;
+      }
+
+      .score-badge::before {
+        content: "";
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: #80b000;
+      }
+
+      .offer-main h3 {
+        margin: 10px 0 3px;
+        font-size: 1.28rem;
+        line-height: 1.2;
+        letter-spacing: -0.03em;
+      }
+
+      .version {
+        margin: 0;
+        color: var(--muted);
+        font-size: 0.84rem;
+      }
+
+      .specs {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px 15px;
+        margin: 18px 0 0;
+        color: #4c5048;
+        font-size: 0.82rem;
+        font-weight: 650;
+      }
+
+      .spec {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+      }
+
+      .spec svg { width: 16px; height: 16px; color: #878c81; }
+
+      .offer-price {
+        align-self: stretch;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        border-left: 1px solid #e3e4df;
+        padding-left: 20px;
+      }
+
+      .price-label { color: var(--muted); font-size: 0.72rem; font-weight: 700; }
+      .price { margin-top: 2px; font-size: 1.45rem; font-weight: 900; letter-spacing: -0.04em; }
+      .market-delta { margin-top: 4px; color: var(--good); font-size: 0.78rem; font-weight: 750; }
+
+      .source-button {
+        width: 100%;
+        margin-top: 16px;
+        background: var(--accent);
+        color: #202510;
+      }
+
+      .source-button:hover { background: #bcef24; }
+
+      .favorite-button {
+        position: absolute;
+        top: 14px;
+        right: 14px;
+        z-index: 4;
+        width: 38px;
+        min-height: 38px;
+        border: 1px solid rgba(255,255,255,.54);
+        background: rgba(16,18,15,.65);
+        color: #fff;
+        display: grid;
+        place-items: center;
+        backdrop-filter: blur(6px);
+      }
+
+      .favorite-button svg { width: 19px; height: 19px; }
+      .favorite-button[aria-pressed="true"] { background: var(--accent); color: var(--dark); }
+      .favorite-button[aria-pressed="true"] svg { fill: currentColor; }
+
+      .empty-state {
+        padding: 54px 24px;
+        text-align: center;
+        border: 1px dashed #cfd2c8;
+        border-radius: var(--radius);
+        background: rgba(255,255,255,.58);
+      }
+
+      .empty-state h3 { margin: 0 0 6px; }
+      .empty-state p { margin: 0 0 20px; color: var(--muted); }
+
+      .disclaimer {
+        margin: 22px 0 0;
+        padding: 14px 16px;
+        border-radius: 13px;
+        background: #e9ebe4;
+        color: #5b6056;
+        font-size: 0.78rem;
+      }
+
+      footer {
+        padding: 28px 0 42px;
+        border-top: 1px solid var(--line);
+        color: var(--muted);
+        font-size: 0.8rem;
+        display: flex;
+        justify-content: space-between;
+        gap: 20px;
+      }
+
+      .toast {
+        position: fixed;
+        left: 50%;
+        bottom: 22px;
+        z-index: 50;
+        translate: -50% 18px;
+        opacity: 0;
+        pointer-events: none;
+        border-radius: 12px;
+        background: var(--dark);
+        color: #fff;
+        padding: 12px 16px;
+        box-shadow: 0 16px 40px rgba(0,0,0,.24);
+        font-size: 0.86rem;
+        font-weight: 700;
+        transition: 180ms ease;
+      }
+
+      .toast.show { opacity: 1; translate: -50% 0; }
+
+      @media (max-width: 1080px) {
+        .workspace { grid-template-columns: 280px minmax(0, 1fr); }
+        .offer-card { grid-template-columns: 180px minmax(0, 1fr); }
+        .offer-price {
+          grid-column: 2;
+          border-left: 0;
+          border-top: 1px solid #e3e4df;
+          padding: 14px 0 0;
+          display: grid;
+          grid-template-columns: 1fr auto;
+          align-items: end;
+          gap: 4px 16px;
+        }
+        .price-label, .market-delta { grid-column: 1; }
+        .price { grid-column: 1; }
+        .source-button { grid-column: 2; grid-row: 1 / 4; width: 150px; margin: 0; }
+      }
+
+      @media (max-width: 820px) {
+        .topbar-inner, main, footer { width: min(100% - 28px, 720px); }
+        main { padding-top: 18px; }
+        .spotlight { grid-template-columns: 1fr; min-height: 350px; }
+        .spotlight-copy { padding: 30px; }
+        .spotlight-media { position: absolute; inset: 0; min-height: 350px; opacity: .5; }
+        .spotlight-media::after { background: linear-gradient(90deg, rgba(16,18,15,.98), rgba(16,18,15,.52) 62%, rgba(16,18,15,.32)); }
+        .workspace { grid-template-columns: 1fr; }
+        .filters {
+          position: fixed;
+          inset: auto 14px 14px;
+          z-index: 40;
+          max-height: calc(100dvh - 28px);
+          overflow: auto;
+          translate: 0 calc(100% + 32px);
+          transition: translate 220ms ease;
+          box-shadow: 0 22px 70px rgba(0,0,0,.28);
+        }
+        .filters.open { translate: 0 0; }
+        .mobile-filter-button { display: inline-flex; align-items: center; }
+      }
+
+      @media (max-width: 620px) {
+        .topbar-inner { min-height: 64px; }
+        .demo-pill span { display: none; }
+        .spotlight { min-height: 390px; border-radius: 22px; }
+        .spotlight-media { min-height: 390px; }
+        .spotlight-copy { padding: 26px 22px; justify-content: flex-end; }
+        .spotlight p:not(.eyebrow) { font-size: .92rem; }
+        .results-toolbar { align-items: flex-end; }
+        .toolbar-actions { gap: 7px; }
+        .sort-label { display: none; }
+        .sort-select { min-width: 0; width: 142px; padding-left: 9px; }
+        .offer-card { grid-template-columns: 1fr; padding: 12px; gap: 14px; }
+        .car-photo { height: 210px; }
+        .offer-main { padding: 0 4px; }
+        .offer-price {
+          grid-column: 1;
+          margin: 0 4px;
+          grid-template-columns: 1fr 132px;
+        }
+        .source-button { width: 132px; }
+        footer { flex-direction: column; }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        *, *::before, *::after { scroll-behavior: auto !important; transition: none !important; }
+      }
+    </style>
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="topbar-inner">
+        <a class="brand" href="#top" aria-label="GarimpaCar — início">
+          <span class="brand-mark" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none"><path d="M4 14h16l-1.8-5.1A3 3 0 0 0 15.4 7H8.6a3 3 0 0 0-2.8 1.9L4 14Z" stroke="currentColor" stroke-width="1.8"/><path d="M3.5 14h17v4.5H3.5V14Z" stroke="currentColor" stroke-width="1.8"/><circle cx="7" cy="17" r="1.4" fill="currentColor"/><circle cx="17" cy="17" r="1.4" fill="currentColor"/></svg>
+          </span>
+          GarimpaCar
+        </a>
+        <span class="demo-pill"><span>Protótipo com dados demonstrativos</span></span>
+      </div>
+    </header>
+
+    <main id="top">
+      <section class="spotlight" aria-labelledby="page-title">
+        <div class="spotlight-copy">
+          <p class="eyebrow">Compare. Escolha. Economize.</p>
+          <h1 id="page-title">O carro certo, pelo preço certo.</h1>
+          <p>Defina o que importa para você e veja primeiro as ofertas com melhor combinação de preço, ano, quilometragem e equipamentos.</p>
+        </div>
+        <div class="spotlight-media" aria-hidden="true">
+          <img src="assets/garimpacar-hero.png" alt="" />
+        </div>
+      </section>
+
+      <div class="workspace">
+        <form class="filters" id="filters" aria-label="Filtros de busca">
+          <h2>O que você procura?</h2>
+          <p class="filters-subtitle">Ajuste os filtros para refinar o ranking.</p>
+
+          <div class="field">
+            <label for="brand">Marca</label>
+            <select id="brand" name="brand">
+              <option value="">Todas as marcas</option>
+            </select>
+          </div>
+
+          <div class="field">
+            <label for="model">Modelo</label>
+            <select id="model" name="model" disabled>
+              <option value="">Todos os modelos</option>
+            </select>
+          </div>
+
+          <div class="field">
+            <label>Faixa de preço</label>
+            <div class="field-row">
+              <input id="minPrice" name="minPrice" type="number" min="0" step="1000" placeholder="Mínimo" aria-label="Preço mínimo" />
+              <input id="maxPrice" name="maxPrice" type="number" min="0" step="1000" placeholder="Máximo" aria-label="Preço máximo" />
+            </div>
+          </div>
+
+          <div class="field">
+            <label>Ano</label>
+            <div class="field-row">
+              <select id="minYear" name="minYear" aria-label="Ano mínimo">
+                <option value="">De</option>
+              </select>
+              <select id="maxYear" name="maxYear" aria-label="Ano máximo">
+                <option value="">Até</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="maxKm">Quilometragem máxima</label>
+            <select id="maxKm" name="maxKm">
+              <option value="">Qualquer km</option>
+              <option value="20000">Até 20.000 km</option>
+              <option value="40000">Até 40.000 km</option>
+              <option value="60000">Até 60.000 km</option>
+              <option value="80000">Até 80.000 km</option>
+            </select>
+          </div>
+
+          <div class="field">
+            <label for="transmission">Câmbio</label>
+            <select id="transmission" name="transmission">
+              <option value="">Todos</option>
+              <option value="Automático">Automático</option>
+              <option value="Manual">Manual</option>
+            </select>
+          </div>
+
+          <fieldset>
+            <legend>Opcionais desejados</legend>
+            <div class="checks">
+              <label class="check"><input type="checkbox" name="feature" value="Câmera de ré" /> Câmera de ré</label>
+              <label class="check"><input type="checkbox" name="feature" value="Multimídia" /> Multimídia</label>
+              <label class="check"><input type="checkbox" name="feature" value="Couro" /> Bancos em couro</label>
+              <label class="check"><input type="checkbox" name="feature" value="Piloto automático" /> Piloto automático</label>
+            </div>
+          </fieldset>
+
+          <div class="filter-actions">
+            <button class="primary" type="submit">Encontrar ofertas</button>
+            <button class="ghost" id="clearFilters" type="button" aria-label="Limpar filtros">Limpar</button>
+          </div>
+        </form>
+
+        <section class="results" aria-labelledby="results-title">
+          <div class="results-toolbar">
+            <div>
+              <h2 id="results-title">Melhores oportunidades</h2>
+              <p class="result-count" id="resultCount" aria-live="polite"></p>
+            </div>
+            <div class="toolbar-actions">
+              <button class="mobile-filter-button" id="mobileFilterButton" type="button" aria-controls="filters" aria-expanded="false">Filtros</button>
+              <label class="sort-label" for="sort">Ordenar por</label>
+              <select class="sort-select" id="sort">
+                <option value="score">Melhor negócio</option>
+                <option value="priceAsc">Menor preço</option>
+                <option value="yearDesc">Mais novo</option>
+                <option value="kmAsc">Menor km</option>
+              </select>
+            </div>
+          </div>
+          <div class="active-filters" id="activeFilters" aria-label="Filtros ativos"></div>
+          <div class="offer-list" id="offerList"></div>
+          <p class="disclaimer">As ofertas, preços e pontuações desta primeira versão são simulados para demonstrar a experiência. Nenhum anúncio real é consultado ainda.</p>
+        </section>
+      </div>
+    </main>
+
+    <footer>
+      <span>© 2026 GarimpaCar</span>
+      <span>Uma forma mais inteligente de começar a busca pelo seu próximo carro.</span>
+    </footer>
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+    <script>
+      const offers = [
+        { id: 1, brand: "Toyota", model: "Corolla", version: "2.0 Altis Premium CVT", year: 2023, km: 28400, transmission: "Automático", price: 142900, market: 151500, score: 96, source: "Webmotors", city: "São Paulo, SP", features: ["Câmera de ré", "Multimídia", "Couro", "Piloto automático"] },
+        { id: 2, brand: "Honda", model: "HR-V", version: "1.5 EXL CVT", year: 2022, km: 31700, transmission: "Automático", price: 139800, market: 148000, score: 94, source: "OLX", city: "Campinas, SP", features: ["Câmera de ré", "Multimídia", "Couro", "Piloto automático"] },
+        { id: 3, brand: "Volkswagen", model: "T-Cross", version: "1.4 250 TSI Highline", year: 2023, km: 22100, transmission: "Automático", price: 134500, market: 140900, score: 92, source: "Mercado Livre", city: "Santo André, SP", features: ["Câmera de ré", "Multimídia", "Couro", "Piloto automático"] },
+        { id: 4, brand: "Jeep", model: "Renegade", version: "1.3 T270 Longitude", year: 2022, km: 38900, transmission: "Automático", price: 112900, market: 119800, score: 91, source: "Webmotors", city: "São Bernardo, SP", features: ["Câmera de ré", "Multimídia", "Couro"] },
+        { id: 5, brand: "Hyundai", model: "HB20", version: "1.0 TGDI Platinum", year: 2024, km: 14600, transmission: "Automático", price: 106900, market: 111500, score: 90, source: "OLX", city: "São Paulo, SP", features: ["Câmera de ré", "Multimídia", "Piloto automático"] },
+        { id: 6, brand: "Chevrolet", model: "Onix", version: "1.0 Turbo Premier", year: 2023, km: 26000, transmission: "Automático", price: 98900, market: 103700, score: 89, source: "Mercado Livre", city: "Osasco, SP", features: ["Câmera de ré", "Multimídia", "Couro"] },
+        { id: 7, brand: "Nissan", model: "Kicks", version: "1.6 Exclusive CVT", year: 2022, km: 41000, transmission: "Automático", price: 116500, market: 122800, score: 87, source: "Webmotors", city: "Barueri, SP", features: ["Câmera de ré", "Multimídia", "Couro", "Piloto automático"] },
+        { id: 8, brand: "Volkswagen", model: "Polo", version: "1.0 TSI Comfortline", year: 2023, km: 33800, transmission: "Automático", price: 96900, market: 101200, score: 86, source: "OLX", city: "Guarulhos, SP", features: ["Câmera de ré", "Multimídia"] },
+        { id: 9, brand: "Fiat", model: "Argo", version: "1.3 Drive", year: 2022, km: 46200, transmission: "Manual", price: 72900, market: 76600, score: 82, source: "Mercado Livre", city: "Jundiaí, SP", features: ["Câmera de ré", "Multimídia"] }
+      ];
+
+      const $ = (selector) => document.querySelector(selector);
+      const filtersForm = $("#filters");
+      const offerList = $("#offerList");
+      const resultCount = $("#resultCount");
+      const activeFilters = $("#activeFilters");
+      const brandSelect = $("#brand");
+      const modelSelect = $("#model");
+      const sortSelect = $("#sort");
+      const toast = $("#toast");
+      const heroImage = "assets/garimpacar-hero.png";
+      let appliedFilters = {};
+      let favorites = new Set(JSON.parse(localStorage.getItem("garimpacar:favorites") || "[]"));
+
+      const icons = {
+        calendar: '<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M7 3v3m10-3v3M4 9h16M5 5h14a1 1 0 0 1 1 1v14H4V6a1 1 0 0 1 1-1Z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>',
+        road: '<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M9 3 7 21m8-18 2 18M12 5v3m0 4v3m0 4v2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>',
+        gear: '<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.8"/><path d="M12 3v3m0 12v3m9-9h-3M6 12H3m15.4-6.4-2.1 2.1M7.7 16.3l-2.1 2.1m12.8 0-2.1-2.1M7.7 7.7 5.6 5.6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>',
+        pin: '<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M19 10c0 5-7 11-7 11S5 15 5 10a7 7 0 1 1 14 0Z" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="10" r="2.2" stroke="currentColor" stroke-width="1.8"/></svg>',
+        heart: '<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M20.8 4.7a5.5 5.5 0 0 0-7.8 0L12 5.8l-1.1-1.1a5.5 5.5 0 0 0-7.8 7.8l1.1 1.1L12 21l7.8-7.4 1.1-1.1a5.5 5.5 0 0 0-.1-7.8Z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>'
+      };
+
+      const formatMoney = value => new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL", maximumFractionDigits: 0 }).format(value);
+      const formatKm = value => new Intl.NumberFormat("pt-BR").format(value) + " km";
+
+      function initializeOptions() {
+        const brands = [...new Set(offers.map(offer => offer.brand))].sort();
+        brandSelect.insertAdjacentHTML("beforeend", brands.map(brand => `<option value="${brand}">${brand}</option>`).join(""));
+        for (let year = 2026; year >= 2015; year--) {
+          $("#minYear").insertAdjacentHTML("beforeend", `<option value="${year}">${year}</option>`);
+          $("#maxYear").insertAdjacentHTML("beforeend", `<option value="${year}">${year}</option>`);
+        }
+      }
+
+      function updateModels() {
+        const selectedBrand = brandSelect.value;
+        const models = [...new Set(offers.filter(offer => !selectedBrand || offer.brand === selectedBrand).map(offer => offer.model))].sort();
+        modelSelect.innerHTML = '<option value="">Todos os modelos</option>' + models.map(model => `<option value="${model}">${model}</option>`).join("");
+        modelSelect.disabled = !selectedBrand;
+      }
+
+      function readFilters() {
+        const formData = new FormData(filtersForm);
+        return {
+          brand: formData.get("brand") || "",
+          model: formData.get("model") || "",
+          minPrice: Number(formData.get("minPrice")) || 0,
+          maxPrice: Number(formData.get("maxPrice")) || Infinity,
+          minYear: Number(formData.get("minYear")) || 0,
+          maxYear: Number(formData.get("maxYear")) || Infinity,
+          maxKm: Number(formData.get("maxKm")) || Infinity,
+          transmission: formData.get("transmission") || "",
+          features: formData.getAll("feature")
+        };
+      }
+
+      function getVisibleOffers() {
+        const f = appliedFilters;
+        const filtered = offers.filter(offer =>
+          (!f.brand || offer.brand === f.brand) &&
+          (!f.model || offer.model === f.model) &&
+          (!f.minPrice || offer.price >= f.minPrice) &&
+          (!f.maxPrice || offer.price <= f.maxPrice) &&
+          (!f.minYear || offer.year >= f.minYear) &&
+          (!f.maxYear || offer.year <= f.maxYear) &&
+          (!f.maxKm || offer.km <= f.maxKm) &&
+          (!f.transmission || offer.transmission === f.transmission) &&
+          (!f.features?.length || f.features.every(feature => offer.features.includes(feature)))
+        );
+
+        const sorted = [...filtered];
+        if (sortSelect.value === "priceAsc") sorted.sort((a, b) => a.price - b.price);
+        else if (sortSelect.value === "yearDesc") sorted.sort((a, b) => b.year - a.year || a.km - b.km);
+        else if (sortSelect.value === "kmAsc") sorted.sort((a, b) => a.km - b.km);
+        else sorted.sort((a, b) => b.score - a.score);
+        return sorted;
+      }
+
+      function renderChips() {
+        const chips = [];
+        if (appliedFilters.brand) chips.push(appliedFilters.brand);
+        if (appliedFilters.model) chips.push(appliedFilters.model);
+        if (appliedFilters.maxPrice !== Infinity) chips.push(`Até ${formatMoney(appliedFilters.maxPrice)}`);
+        if (appliedFilters.minYear) chips.push(`A partir de ${appliedFilters.minYear}`);
+        if (appliedFilters.maxKm !== Infinity) chips.push(`Até ${formatKm(appliedFilters.maxKm)}`);
+        if (appliedFilters.transmission) chips.push(appliedFilters.transmission);
+        chips.push(...(appliedFilters.features || []));
+        activeFilters.innerHTML = chips.map(chip => `<span class="chip">${chip}</span>`).join("");
+      }
+
+      function renderOffers() {
+        const visibleOffers = getVisibleOffers();
+        resultCount.textContent = `${visibleOffers.length} ${visibleOffers.length === 1 ? "oferta encontrada" : "ofertas encontradas"}`;
+        renderChips();
+
+        if (!visibleOffers.length) {
+          offerList.innerHTML = `<div class="empty-state"><h3>Nenhuma oferta com essa combinação</h3><p>Tente ampliar o preço, ano ou quilometragem.</p><button class="primary" type="button" data-reset>Limpar filtros</button></div>`;
+          offerList.querySelector("[data-reset]").addEventListener("click", resetFilters);
+          return;
+        }
+
+        offerList.innerHTML = visibleOffers.map(offer => {
+          const difference = offer.market - offer.price;
+          const favorite = favorites.has(offer.id);
+          return `
+            <article class="offer-card" data-offer-id="${offer.id}">
+              <div class="car-photo">
+                <img src="${heroImage}" alt="Foto ilustrativa de ${offer.brand} ${offer.model}" />
+                <span class="source-tag">${offer.source}</span>
+                <button class="favorite-button" type="button" data-favorite="${offer.id}" aria-label="${favorite ? "Remover dos favoritos" : "Salvar nos favoritos"}" aria-pressed="${favorite}">${icons.heart}</button>
+              </div>
+              <div class="offer-main">
+                <span class="score-badge">${offer.score}% compatível</span>
+                <h3>${offer.brand} ${offer.model}</h3>
+                <p class="version">${offer.version}</p>
+                <div class="specs">
+                  <span class="spec">${icons.calendar}${offer.year}</span>
+                  <span class="spec">${icons.road}${formatKm(offer.km)}</span>
+                  <span class="spec">${icons.gear}${offer.transmission}</span>
+                  <span class="spec">${icons.pin}${offer.city}</span>
+                </div>
+              </div>
+              <div class="offer-price">
+                <span class="price-label">Preço anunciado</span>
+                <strong class="price">${formatMoney(offer.price)}</strong>
+                <span class="market-delta">${formatMoney(difference)} abaixo da referência</span>
+                <button class="source-button" type="button" data-details="${offer.id}">Ver oportunidade</button>
+              </div>
+            </article>`;
+        }).join("");
+
+        offerList.querySelectorAll("[data-favorite]").forEach(button => button.addEventListener("click", toggleFavorite));
+        offerList.querySelectorAll("[data-details]").forEach(button => button.addEventListener("click", showDemoNotice));
+      }
+
+      function applyFilters(event) {
+        event?.preventDefault();
+        appliedFilters = readFilters();
+        renderOffers();
+        closeMobileFilters();
+      }
+
+      function resetFilters() {
+        filtersForm.reset();
+        updateModels();
+        appliedFilters = {};
+        renderOffers();
+        closeMobileFilters();
+      }
+
+      function toggleFavorite(event) {
+        const id = Number(event.currentTarget.dataset.favorite);
+        if (favorites.has(id)) favorites.delete(id); else favorites.add(id);
+        localStorage.setItem("garimpacar:favorites", JSON.stringify([...favorites]));
+        renderOffers();
+        showToast(favorites.has(id) ? "Oferta salva nos favoritos" : "Oferta removida dos favoritos");
+      }
+
+      function showDemoNotice(event) {
+        const offer = offers.find(item => item.id === Number(event.currentTarget.dataset.details));
+        showToast(`${offer.source}: integração real será adicionada na próxima etapa`);
+      }
+
+      let toastTimer;
+      function showToast(message) {
+        toast.textContent = message;
+        toast.classList.add("show");
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(() => toast.classList.remove("show"), 2800);
+      }
+
+      function closeMobileFilters() {
+        filtersForm.classList.remove("open");
+        $("#mobileFilterButton").setAttribute("aria-expanded", "false");
+      }
+
+      function registerWebMcpTools() {
+        const context = document.modelContext;
+        if (!context?.registerTool) return;
+        const validBrands = [...new Set(offers.map(offer => offer.brand))];
+
+        try {
+          context.registerTool({
+            name: "configure_vehicle_search",
+            title: "Configurar busca de veículos",
+            description: "Atualiza os filtros visíveis da busca do GarimpaCar e mostra as ofertas correspondentes.",
+            inputSchema: {
+              type: "object",
+              properties: {
+                brand: { type: "string", enum: ["", ...validBrands] },
+                model: { type: "string" },
+                maxPrice: { type: "number", minimum: 0 },
+                minYear: { type: "integer", minimum: 2015, maximum: 2026 },
+                maxKm: { type: "integer", minimum: 0 },
+                transmission: { type: "string", enum: ["", "Automático", "Manual"] }
+              },
+              additionalProperties: false
+            },
+            annotations: { readOnlyHint: false, untrustedContentHint: false },
+            execute(input) {
+              if (!input || typeof input !== "object") throw new Error("Filtros inválidos");
+              const allowedKeys = ["brand", "model", "maxPrice", "minYear", "maxKm", "transmission"];
+              if (Object.keys(input).some(key => !allowedKeys.includes(key))) throw new Error("Filtro não reconhecido");
+              if (input.brand !== undefined && !["", ...validBrands].includes(input.brand)) throw new Error("Marca inválida");
+              if (input.maxPrice !== undefined && (!Number.isFinite(input.maxPrice) || input.maxPrice < 0)) throw new Error("Preço máximo inválido");
+              if (input.minYear !== undefined && (!Number.isInteger(input.minYear) || input.minYear < 2015 || input.minYear > 2026)) throw new Error("Ano mínimo inválido");
+              if (input.maxKm !== undefined && (!Number.isInteger(input.maxKm) || input.maxKm < 0)) throw new Error("Quilometragem inválida");
+              if (input.transmission !== undefined && !["", "Automático", "Manual"].includes(input.transmission)) throw new Error("Câmbio inválido");
+              if (input.brand !== undefined) brandSelect.value = input.brand;
+              updateModels();
+              const validModels = [...modelSelect.options].map(option => option.value);
+              if (input.model !== undefined && !validModels.includes(input.model)) throw new Error("Modelo inválido para a marca selecionada");
+              if (input.model !== undefined) modelSelect.value = input.model;
+              if (input.maxPrice !== undefined) $("#maxPrice").value = input.maxPrice;
+              if (input.minYear !== undefined) $("#minYear").value = input.minYear;
+              if (input.maxKm !== undefined) $("#maxKm").value = input.maxKm;
+              if (input.transmission !== undefined) $("#transmission").value = input.transmission;
+              applyFilters();
+              return { filters: input, resultCount: getVisibleOffers().length };
+            }
+          });
+
+          context.registerTool({
+            name: "list_visible_vehicle_offers",
+            title: "Listar ofertas visíveis",
+            description: "Retorna um resumo das ofertas que aparecem no ranking atual do GarimpaCar.",
+            inputSchema: { type: "object", properties: {}, additionalProperties: false },
+            annotations: { readOnlyHint: true, untrustedContentHint: false },
+            execute() {
+              return getVisibleOffers().map(({ id, brand, model, year, km, price, score, source }) => ({ id, brand, model, year, km, price, score, source }));
+            }
+          });
+        } catch (error) {
+          console.warn("WebMCP indisponível", error);
+        }
+      }
+
+      brandSelect.addEventListener("change", updateModels);
+      filtersForm.addEventListener("submit", applyFilters);
+      $("#clearFilters").addEventListener("click", resetFilters);
+      sortSelect.addEventListener("change", renderOffers);
+      $("#mobileFilterButton").addEventListener("click", event => {
+        const isOpen = filtersForm.classList.toggle("open");
+        event.currentTarget.setAttribute("aria-expanded", String(isOpen));
+      });
+      document.addEventListener("keydown", event => { if (event.key === "Escape") closeMobileFilters(); });
+
+      initializeOptions();
+      updateModels();
+      appliedFilters = readFilters();
+      renderOffers();
+      registerWebMcpTools();
+    </script>
+  </body>
+</html>
