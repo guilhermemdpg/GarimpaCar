@@ -122,6 +122,16 @@
         box-shadow: 0 0 0 4px rgba(168, 219, 17, 0.16);
       }
 
+      .demo-pill[data-state="loading"]::before {
+        background: #e0a21b;
+        box-shadow: 0 0 0 4px rgba(224, 162, 27, 0.16);
+      }
+
+      .demo-pill[data-state="error"]::before {
+        background: #d84d4d;
+        box-shadow: 0 0 0 4px rgba(216, 77, 77, 0.14);
+      }
+
       main { padding-block: 28px 64px; }
 
       .spotlight {
@@ -229,7 +239,8 @@
       }
 
       select,
-      input[type="number"] {
+      input[type="number"],
+      input[type="text"] {
         width: 100%;
         min-height: 46px;
         border: 1px solid #d8dad3;
@@ -466,6 +477,10 @@
         margin-top: 16px;
         background: var(--accent);
         color: #202510;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        text-decoration: none;
       }
 
       .source-button:hover { background: #bcef24; }
@@ -499,6 +514,35 @@
 
       .empty-state h3 { margin: 0 0 6px; }
       .empty-state p { margin: 0 0 20px; color: var(--muted); }
+
+      .loading-state {
+        min-height: 230px;
+        display: grid;
+        place-items: center;
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        background: rgba(255,255,255,.58);
+        color: var(--muted);
+        font-weight: 700;
+      }
+
+      .loading-state span {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .loading-state span::before {
+        content: "";
+        width: 15px;
+        height: 15px;
+        border: 2px solid #c8cbc1;
+        border-top-color: var(--dark);
+        border-radius: 50%;
+        animation: spin 700ms linear infinite;
+      }
+
+      @keyframes spin { to { transform: rotate(360deg); } }
 
       .disclaimer {
         margin: 22px 0 0;
@@ -616,7 +660,7 @@
           </span>
           GarimpaCar
         </a>
-        <span class="demo-pill"><span>Protótipo com dados demonstrativos</span></span>
+        <span class="demo-pill" id="sourceStatus" data-state="loading"><span>Conectando ao Mercado Livre</span></span>
       </div>
     </header>
 
@@ -646,9 +690,7 @@
 
           <div class="field">
             <label for="model">Modelo</label>
-            <select id="model" name="model" disabled>
-              <option value="">Todos os modelos</option>
-            </select>
+            <input id="model" name="model" type="text" placeholder="Ex.: Corolla" autocomplete="off" />
           </div>
 
           <div class="field">
@@ -726,7 +768,7 @@
           </div>
           <div class="active-filters" id="activeFilters" aria-label="Filtros ativos"></div>
           <div class="offer-list" id="offerList"></div>
-          <p class="disclaimer">As ofertas, preços e pontuações desta primeira versão são simulados para demonstrar a experiência. Nenhum anúncio real é consultado ainda.</p>
+          <p class="disclaimer">Os anúncios são fornecidos pela API oficial do Mercado Livre. O ranking é calculado localmente a partir do preço, ano, quilometragem e mediana dos resultados; confirme sempre os dados na página original.</p>
         </section>
       </div>
     </main>
@@ -738,17 +780,10 @@
     <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
     <script>
-      const offers = [
-        { id: 1, brand: "Toyota", model: "Corolla", version: "2.0 Altis Premium CVT", year: 2023, km: 28400, transmission: "Automático", price: 142900, market: 151500, score: 96, source: "Webmotors", city: "São Paulo, SP", features: ["Câmera de ré", "Multimídia", "Couro", "Piloto automático"] },
-        { id: 2, brand: "Honda", model: "HR-V", version: "1.5 EXL CVT", year: 2022, km: 31700, transmission: "Automático", price: 139800, market: 148000, score: 94, source: "OLX", city: "Campinas, SP", features: ["Câmera de ré", "Multimídia", "Couro", "Piloto automático"] },
-        { id: 3, brand: "Volkswagen", model: "T-Cross", version: "1.4 250 TSI Highline", year: 2023, km: 22100, transmission: "Automático", price: 134500, market: 140900, score: 92, source: "Mercado Livre", city: "Santo André, SP", features: ["Câmera de ré", "Multimídia", "Couro", "Piloto automático"] },
-        { id: 4, brand: "Jeep", model: "Renegade", version: "1.3 T270 Longitude", year: 2022, km: 38900, transmission: "Automático", price: 112900, market: 119800, score: 91, source: "Webmotors", city: "São Bernardo, SP", features: ["Câmera de ré", "Multimídia", "Couro"] },
-        { id: 5, brand: "Hyundai", model: "HB20", version: "1.0 TGDI Platinum", year: 2024, km: 14600, transmission: "Automático", price: 106900, market: 111500, score: 90, source: "OLX", city: "São Paulo, SP", features: ["Câmera de ré", "Multimídia", "Piloto automático"] },
-        { id: 6, brand: "Chevrolet", model: "Onix", version: "1.0 Turbo Premier", year: 2023, km: 26000, transmission: "Automático", price: 98900, market: 103700, score: 89, source: "Mercado Livre", city: "Osasco, SP", features: ["Câmera de ré", "Multimídia", "Couro"] },
-        { id: 7, brand: "Nissan", model: "Kicks", version: "1.6 Exclusive CVT", year: 2022, km: 41000, transmission: "Automático", price: 116500, market: 122800, score: 87, source: "Webmotors", city: "Barueri, SP", features: ["Câmera de ré", "Multimídia", "Couro", "Piloto automático"] },
-        { id: 8, brand: "Volkswagen", model: "Polo", version: "1.0 TSI Comfortline", year: 2023, km: 33800, transmission: "Automático", price: 96900, market: 101200, score: 86, source: "OLX", city: "Guarulhos, SP", features: ["Câmera de ré", "Multimídia"] },
-        { id: 9, brand: "Fiat", model: "Argo", version: "1.3 Drive", year: 2022, km: 46200, transmission: "Manual", price: 72900, market: 76600, score: 82, source: "Mercado Livre", city: "Jundiaí, SP", features: ["Câmera de ré", "Multimídia"] }
-      ];
+      let offers = [];
+      let isLoading = true;
+      let loadError = null;
+      const vehicleBrands = ["Chevrolet", "Citroën", "Fiat", "Ford", "Honda", "Hyundai", "Jeep", "Nissan", "Peugeot", "Renault", "Toyota", "Volkswagen"];
 
       const $ = (selector) => document.querySelector(selector);
       const filtersForm = $("#filters");
@@ -759,6 +794,7 @@
       const modelSelect = $("#model");
       const sortSelect = $("#sort");
       const toast = $("#toast");
+      const sourceStatus = $("#sourceStatus");
       const heroImage = "assets/garimpacar-hero.png";
       let appliedFilters = {};
       let favorites = new Set(JSON.parse(localStorage.getItem("garimpacar:favorites") || "[]"));
@@ -772,22 +808,16 @@
       };
 
       const formatMoney = value => new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL", maximumFractionDigits: 0 }).format(value);
-      const formatKm = value => new Intl.NumberFormat("pt-BR").format(value) + " km";
+      const formatKm = value => value === null || value === undefined ? "Km não informado" : new Intl.NumberFormat("pt-BR").format(value) + " km";
+      const normalizedText = value => String(value || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim();
+      const escapeHtml = value => String(value ?? "").replace(/[&<>'"]/g, character => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#39;", '"': "&quot;" })[character]);
 
       function initializeOptions() {
-        const brands = [...new Set(offers.map(offer => offer.brand))].sort();
-        brandSelect.insertAdjacentHTML("beforeend", brands.map(brand => `<option value="${brand}">${brand}</option>`).join(""));
+        brandSelect.insertAdjacentHTML("beforeend", vehicleBrands.map(brand => `<option value="${brand}">${brand}</option>`).join(""));
         for (let year = 2026; year >= 2015; year--) {
           $("#minYear").insertAdjacentHTML("beforeend", `<option value="${year}">${year}</option>`);
           $("#maxYear").insertAdjacentHTML("beforeend", `<option value="${year}">${year}</option>`);
         }
-      }
-
-      function updateModels() {
-        const selectedBrand = brandSelect.value;
-        const models = [...new Set(offers.filter(offer => !selectedBrand || offer.brand === selectedBrand).map(offer => offer.model))].sort();
-        modelSelect.innerHTML = '<option value="">Todos os modelos</option>' + models.map(model => `<option value="${model}">${model}</option>`).join("");
-        modelSelect.disabled = !selectedBrand;
       }
 
       function readFilters() {
@@ -808,21 +838,21 @@
       function getVisibleOffers() {
         const f = appliedFilters;
         const filtered = offers.filter(offer =>
-          (!f.brand || offer.brand === f.brand) &&
-          (!f.model || offer.model === f.model) &&
+          (!f.brand || normalizedText(offer.brand).includes(normalizedText(f.brand))) &&
+          (!f.model || normalizedText(`${offer.model} ${offer.version}`).includes(normalizedText(f.model))) &&
           (!f.minPrice || offer.price >= f.minPrice) &&
           (!f.maxPrice || offer.price <= f.maxPrice) &&
-          (!f.minYear || offer.year >= f.minYear) &&
-          (!f.maxYear || offer.year <= f.maxYear) &&
-          (!f.maxKm || offer.km <= f.maxKm) &&
+          (!f.minYear || (offer.year && offer.year >= f.minYear)) &&
+          (!f.maxYear || (offer.year && offer.year <= f.maxYear)) &&
+          (!f.maxKm || (offer.km !== null && offer.km <= f.maxKm)) &&
           (!f.transmission || offer.transmission === f.transmission) &&
           (!f.features?.length || f.features.every(feature => offer.features.includes(feature)))
         );
 
         const sorted = [...filtered];
         if (sortSelect.value === "priceAsc") sorted.sort((a, b) => a.price - b.price);
-        else if (sortSelect.value === "yearDesc") sorted.sort((a, b) => b.year - a.year || a.km - b.km);
-        else if (sortSelect.value === "kmAsc") sorted.sort((a, b) => a.km - b.km);
+        else if (sortSelect.value === "yearDesc") sorted.sort((a, b) => (b.year || 0) - (a.year || 0) || (a.km ?? Infinity) - (b.km ?? Infinity));
+        else if (sortSelect.value === "kmAsc") sorted.sort((a, b) => (a.km ?? Infinity) - (b.km ?? Infinity));
         else sorted.sort((a, b) => b.score - a.score);
         return sorted;
       }
@@ -840,12 +870,27 @@
       }
 
       function renderOffers() {
+        if (isLoading) {
+          resultCount.textContent = "Consultando anúncios reais…";
+          activeFilters.innerHTML = "";
+          offerList.innerHTML = '<div class="loading-state"><span>Buscando ofertas no Mercado Livre</span></div>';
+          return;
+        }
+
+        if (loadError) {
+          resultCount.textContent = "Fonte indisponível";
+          renderChips();
+          offerList.innerHTML = `<div class="empty-state"><h3>Conecte a fonte de anúncios</h3><p>${escapeHtml(loadError)}</p><button class="primary" type="button" data-retry>Tentar novamente</button></div>`;
+          offerList.querySelector("[data-retry]").addEventListener("click", loadOffers);
+          return;
+        }
+
         const visibleOffers = getVisibleOffers();
         resultCount.textContent = `${visibleOffers.length} ${visibleOffers.length === 1 ? "oferta encontrada" : "ofertas encontradas"}`;
         renderChips();
 
         if (!visibleOffers.length) {
-          offerList.innerHTML = `<div class="empty-state"><h3>Nenhuma oferta com essa combinação</h3><p>Tente ampliar o preço, ano ou quilometragem.</p><button class="primary" type="button" data-reset>Limpar filtros</button></div>`;
+          offerList.innerHTML = `<div class="empty-state"><h3>Nenhuma oferta real com essa combinação</h3><p>Tente ampliar o preço, ano ou quilometragem.</p><button class="primary" type="button" data-reset>Limpar filtros</button></div>`;
           offerList.querySelector("[data-reset]").addEventListener("click", resetFilters);
           return;
         }
@@ -853,63 +898,91 @@
         offerList.innerHTML = visibleOffers.map(offer => {
           const difference = offer.market - offer.price;
           const favorite = favorites.has(offer.id);
+          const comparisonText = difference >= 0
+            ? `${formatMoney(difference)} abaixo da mediana`
+            : `${formatMoney(Math.abs(difference))} acima da mediana`;
+          const image = offer.thumbnail || heroImage;
           return `
             <article class="offer-card" data-offer-id="${offer.id}">
               <div class="car-photo">
-                <img src="${heroImage}" alt="Foto ilustrativa de ${offer.brand} ${offer.model}" />
-                <span class="source-tag">${offer.source}</span>
+                <img src="${escapeHtml(image)}" alt="${escapeHtml(offer.brand)} ${escapeHtml(offer.model)}" onerror="this.src='${heroImage}'" />
+                <span class="source-tag">${escapeHtml(offer.source)}</span>
                 <button class="favorite-button" type="button" data-favorite="${offer.id}" aria-label="${favorite ? "Remover dos favoritos" : "Salvar nos favoritos"}" aria-pressed="${favorite}">${icons.heart}</button>
               </div>
               <div class="offer-main">
                 <span class="score-badge">${offer.score}% compatível</span>
-                <h3>${offer.brand} ${offer.model}</h3>
-                <p class="version">${offer.version}</p>
+                <h3>${escapeHtml(offer.brand)} ${escapeHtml(offer.model)}</h3>
+                <p class="version">${escapeHtml(offer.version)}</p>
                 <div class="specs">
-                  <span class="spec">${icons.calendar}${offer.year}</span>
+                  <span class="spec">${icons.calendar}${offer.year || "Ano não informado"}</span>
                   <span class="spec">${icons.road}${formatKm(offer.km)}</span>
-                  <span class="spec">${icons.gear}${offer.transmission}</span>
-                  <span class="spec">${icons.pin}${offer.city}</span>
+                  <span class="spec">${icons.gear}${escapeHtml(offer.transmission)}</span>
+                  <span class="spec">${icons.pin}${escapeHtml(offer.city)}</span>
                 </div>
               </div>
               <div class="offer-price">
                 <span class="price-label">Preço anunciado</span>
                 <strong class="price">${formatMoney(offer.price)}</strong>
-                <span class="market-delta">${formatMoney(difference)} abaixo da referência</span>
-                <button class="source-button" type="button" data-details="${offer.id}">Ver oportunidade</button>
+                <span class="market-delta">${comparisonText}</span>
+                <a class="source-button" href="${escapeHtml(offer.permalink)}" target="_blank" rel="noreferrer">Ver anúncio</a>
               </div>
             </article>`;
         }).join("");
 
         offerList.querySelectorAll("[data-favorite]").forEach(button => button.addEventListener("click", toggleFavorite));
-        offerList.querySelectorAll("[data-details]").forEach(button => button.addEventListener("click", showDemoNotice));
       }
 
-      function applyFilters(event) {
+      async function loadOffers(event) {
         event?.preventDefault();
         appliedFilters = readFilters();
+        isLoading = true;
+        loadError = null;
         renderOffers();
         closeMobileFilters();
+
+        const params = new URLSearchParams();
+        if (appliedFilters.brand) params.set("brand", appliedFilters.brand);
+        if (appliedFilters.model) params.set("model", appliedFilters.model);
+        if (appliedFilters.minPrice) params.set("minPrice", appliedFilters.minPrice);
+        if (appliedFilters.maxPrice !== Infinity) params.set("maxPrice", appliedFilters.maxPrice);
+        if (appliedFilters.minYear) params.set("minYear", appliedFilters.minYear);
+        if (appliedFilters.maxYear !== Infinity) params.set("maxYear", appliedFilters.maxYear);
+        if (appliedFilters.maxKm !== Infinity) params.set("maxKm", appliedFilters.maxKm);
+        if (appliedFilters.transmission) params.set("transmission", appliedFilters.transmission);
+        for (const feature of appliedFilters.features || []) params.append("feature", feature);
+
+        try {
+          const response = await fetch(`/api/offers?${params}`);
+          const payload = await response.json();
+          if (!response.ok) throw new Error(payload.message || "Não foi possível consultar os anúncios.");
+          offers = payload.offers || [];
+          sourceStatus.dataset.state = "ready";
+          const updatedAt = new Date(payload.meta.fetchedAt).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
+          sourceStatus.querySelector("span").textContent = `Mercado Livre • atualizado ${updatedAt}`;
+        } catch (error) {
+          offers = [];
+          loadError = error.message;
+          sourceStatus.dataset.state = "error";
+          sourceStatus.querySelector("span").textContent = "Mercado Livre não conectado";
+        } finally {
+          isLoading = false;
+          renderOffers();
+        }
       }
 
-      function resetFilters() {
+      async function resetFilters() {
         filtersForm.reset();
-        updateModels();
         appliedFilters = {};
-        renderOffers();
         closeMobileFilters();
+        await loadOffers();
       }
 
       function toggleFavorite(event) {
-        const id = Number(event.currentTarget.dataset.favorite);
+        const id = event.currentTarget.dataset.favorite;
         if (favorites.has(id)) favorites.delete(id); else favorites.add(id);
         localStorage.setItem("garimpacar:favorites", JSON.stringify([...favorites]));
         renderOffers();
         showToast(favorites.has(id) ? "Oferta salva nos favoritos" : "Oferta removida dos favoritos");
-      }
-
-      function showDemoNotice(event) {
-        const offer = offers.find(item => item.id === Number(event.currentTarget.dataset.details));
-        showToast(`${offer.source}: integração real será adicionada na próxima etapa`);
       }
 
       let toastTimer;
@@ -928,7 +1001,7 @@
       function registerWebMcpTools() {
         const context = document.modelContext;
         if (!context?.registerTool) return;
-        const validBrands = [...new Set(offers.map(offer => offer.brand))];
+        const validBrands = vehicleBrands;
 
         try {
           context.registerTool({
@@ -948,7 +1021,7 @@
               additionalProperties: false
             },
             annotations: { readOnlyHint: false, untrustedContentHint: false },
-            execute(input) {
+            async execute(input) {
               if (!input || typeof input !== "object") throw new Error("Filtros inválidos");
               const allowedKeys = ["brand", "model", "maxPrice", "minYear", "maxKm", "transmission"];
               if (Object.keys(input).some(key => !allowedKeys.includes(key))) throw new Error("Filtro não reconhecido");
@@ -958,15 +1031,13 @@
               if (input.maxKm !== undefined && (!Number.isInteger(input.maxKm) || input.maxKm < 0)) throw new Error("Quilometragem inválida");
               if (input.transmission !== undefined && !["", "Automático", "Manual"].includes(input.transmission)) throw new Error("Câmbio inválido");
               if (input.brand !== undefined) brandSelect.value = input.brand;
-              updateModels();
-              const validModels = [...modelSelect.options].map(option => option.value);
-              if (input.model !== undefined && !validModels.includes(input.model)) throw new Error("Modelo inválido para a marca selecionada");
               if (input.model !== undefined) modelSelect.value = input.model;
               if (input.maxPrice !== undefined) $("#maxPrice").value = input.maxPrice;
               if (input.minYear !== undefined) $("#minYear").value = input.minYear;
               if (input.maxKm !== undefined) $("#maxKm").value = input.maxKm;
               if (input.transmission !== undefined) $("#transmission").value = input.transmission;
-              applyFilters();
+              await loadOffers();
+              if (loadError) throw new Error(loadError);
               return { filters: input, resultCount: getVisibleOffers().length };
             }
           });
@@ -986,8 +1057,7 @@
         }
       }
 
-      brandSelect.addEventListener("change", updateModels);
-      filtersForm.addEventListener("submit", applyFilters);
+      filtersForm.addEventListener("submit", loadOffers);
       $("#clearFilters").addEventListener("click", resetFilters);
       sortSelect.addEventListener("change", renderOffers);
       $("#mobileFilterButton").addEventListener("click", event => {
@@ -997,10 +1067,10 @@
       document.addEventListener("keydown", event => { if (event.key === "Escape") closeMobileFilters(); });
 
       initializeOptions();
-      updateModels();
       appliedFilters = readFilters();
       renderOffers();
       registerWebMcpTools();
+      loadOffers();
     </script>
   </body>
 </html>
